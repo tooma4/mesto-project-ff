@@ -1,31 +1,31 @@
 import { cardTemplate } from "..";
+ 
 
 // @todo: Функция создания карточки
 
 export function createCard(dataCard, removeCard, openModalImage, likeCard ) {
 
   //Копирую шаблон, нахожу элементы и записываю в переменные
-  let newCard = cardTemplate.cloneNode(true);
-  let cardImageLink = newCard.querySelector('.card__image');
-  let cardImageAlt = newCard.querySelector('.card__image');
-  let cardTitle = newCard.querySelector('.card__title');
+  const newCard = cardTemplate.cloneNode(true);
+  const cardImage = newCard.querySelector('.card__image');
+  const cardTitle = newCard.querySelector('.card__title');
 
 
   //нахожу кнопку удаления карточки и вешаю обработчик
-  let iconDelete = newCard.querySelector('.card__delete-button');
+  const iconDelete = newCard.querySelector('.card__delete-button');
   iconDelete.addEventListener('click', removeCard);
 
   //нахожу кнопку лайка карточки и вешаю обработчик
-  let iconLike = newCard.querySelector('.card__like-button');
+  const iconLike = newCard.querySelector('.card__like-button');
   iconLike.addEventListener('click', likeCard);
 
   // задаю значения и возвращаю карточку
-  cardImageLink.src = dataCard.link;
-  cardImageAlt.alt = dataCard.name;
+  cardImage.src = dataCard.link;
+  cardImage.alt = dataCard.name;
   cardTitle.textContent = dataCard.name;
 
   // добавляю слушатель на элемент картинки и вызываю при клике на нем openModalImage
-  cardImageLink.addEventListener('click', () => {
+  cardImage.addEventListener('click', () => {
     openModalImage(dataCard.link, dataCard.name);
   });
 
