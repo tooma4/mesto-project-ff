@@ -1,5 +1,5 @@
 import { cardTemplate } from "..";
- 
+
 
 // @todo: Функция создания карточки
 

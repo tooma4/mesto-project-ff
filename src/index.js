@@ -2,7 +2,7 @@
 import './pages/index.css';
 import { createCard, removeCard, likeCard } from "./components/card";
 import { initialCards } from "./scripts/cards";
-import { openModal, closeModal, handleEscape} from './components/modal';
+import { openModal, closeModal } from './components/modal';
 
 
 
@@ -26,7 +26,7 @@ const popupEdit = document.querySelector('.popup_type_edit');
 const popupAddCard = document.querySelector('.popup_type_new-card');
 
 // попап карточки
-export const popupImage = document.querySelector('.popup_type_image');
+const popupImage = document.querySelector('.popup_type_image');
 
 // элемент картинки попапа
 const popupImageLink = document.querySelector('.popup__image');
@@ -70,20 +70,11 @@ export const cardTemplate = document.querySelector('#card-template').content;
 
 // функция открытия модального окна по картинке
 function openModalImage(link, name) {
-  // Добавляет плавный переход при открытии
-  popupImage.classList.add('popup_is-animated');
 
-  // Ставлю таймер для правильного срабатывания плавного перехода при 1 клике
-  setTimeout(() => {
-    openModal(popupImage);
-  }, 1);
+  openModal(popupImage);
 
   popupImageLink.src = link;
-  popupImageLink.alt = name;
-  popupImageName.textContent = name;
- 
-  // добавил слушатель, при нажатии клавишы Escape - закрыть попап
-  document.addEventListener('keydown', handleEscape);
+  popupImageLink.alt = name;  popupImageName.textContent = name;
   
 }
 
