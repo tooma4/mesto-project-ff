@@ -74,7 +74,8 @@ function openModalImage(link, name) {
   openModal(popupImage);
 
   popupImageLink.src = link;
-  popupImageLink.alt = name;  popupImageName.textContent = name;
+  popupImageLink.alt = name; 
+  popupImageName.textContent = name;
   
 }
 
