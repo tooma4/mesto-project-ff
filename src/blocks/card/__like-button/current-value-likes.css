@@ -1,0 +1,14 @@
+.current-value-likes {
+    position: absolute;
+    bottom: 17px;
+    right: 24.5px;
+    min-width: 10px;
+    max-height: 13px;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 16px;
+
+    color: #000000;
+}

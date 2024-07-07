@@ -1,0 +1,16 @@
+.popup__input_type_error {
+    border-bottom-color: #FF0000;
+  
+    /* Нижняя рамка становится красной всякий раз, 
+    когда введённые данные некорректны */
+  }
+
+.popup__error_visible {
+    opacity: 1;
+    color: #FF0000;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 14.52px;
+    transition: 0.3s;
+    text-align: left;
+}

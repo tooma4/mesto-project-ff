@@ -20,6 +20,7 @@
   opacity: 0.6;
 }
 
+
 @media screen and (max-width: 740px) {
   .profile__add-button {
     width: 50px;
