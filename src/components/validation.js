@@ -1,15 +1,35 @@
 
 function enableValidation(validationConfig) {
 
-    // Находим все поля внутри формы, сделаем из них массив методом Array.from
-    const formList = Array.from(document.querySelectorAll(validationConfig.formSelector));
-   
-    // Обойдём все элементы полученной коллекции
-    formList.forEach((formElement) => {
-      // Для каждой формы вызовем функцию setEventListeners, передав ей элемент формы
-      setEventListeners(formElement, validationConfig);
-    }); 
-  };
+  const formList = Array.from(document.querySelectorAll(validationConfig.formSelector)); // Находим все поля внутри формы, сделаем из них массив методом Array.from
+  
+  formList.forEach((formElement) => { // Обойдём все элементы полученной коллекции
+    setEventListeners(formElement, validationConfig); // Для каждой формы вызовем функцию setEventListeners, передав ей элемент формы
+  }); 
+};
+
+function clearValidation(formElement, validationConfig) {
+    
+  const inputList = Array.from(formElement.querySelectorAll(validationConfig.inputSelector)); // Находим все поля ввода в форме
+    
+    
+  const buttonElement = formElement.querySelector(validationConfig.submitButtonSelector); // Находим кнопку отправки формы
+  
+  inputList.forEach((inputElement) => { // Очищаем ошибки для каждого поля ввода
+
+    const errorElement = formElement.querySelector(`${inputElement.id}-error`);
+
+    if (errorElement) {
+        errorElement.textContent = ''; // Скрываем сообщение об ошибке
+        errorElement.classList.remove(validationConfig.errorClass);
+    }
+  
+    inputElement.classList.remove(validationConfig.inputErrorClass); 
+  });
+  
+  buttonElement.classList.add(validationConfig.inactiveButtonClass); // Делаем кнопку отправки неактивной
+  buttonElement.disabled = true;
+}
   
   function setEventListeners(formElement, validationConfig) {
     // Находим все поля внутри формы,
@@ -102,4 +122,4 @@ function enableValidation(validationConfig) {
     }
   };
 
-  export {enableValidation};
+  export {enableValidation, clearValidation};

@@ -1,35 +1,16 @@
 
-// функция открытие модального окна
-export function openModal(modal) {
-
-  // Добавляет плавный переход при открытии
-  modal.classList.add('popup_is-animated');
-
-  // Ставлю таймер для правильного срабатывания плавного перехода при 1 клике
-  setTimeout(() => {
-    // Добавление класса, окну (класс показывает окно)
-    modal.classList.add('popup_is-opened');
-  }, 1);
-  
-  // добавил слушатель, при нажатии клавишы Escape - закрыть попап
-  document.addEventListener('keydown', handleEscape);
+export function openModal(modal) { // функция открытие модального окна
+  modal.classList.add('popup_is-opened'); // Добавление класса, окну (класс показывает окно)
+  document.addEventListener('keydown', handleEscape); // добавил слушатель, при нажатии клавишы Escape - закрыть попап
 };
 
-// функция закрытия модального окна
-export function closeModal(modal) {
-
-  // Добавляет плавный переход при закрытии
-  modal.classList.add('popup_is-animated');
-  // Удаляет класс у модального окна
-  modal.classList.remove('popup_is-opened');
-
-  // удалил слушатель клавиши Escape
-  document.removeEventListener('keydown', handleEscape);
-
+export function closeModal(modal, handleConfirmDeleteFormSubmit) { // функция закрытия модального окна
+  modal.classList.remove('popup_is-opened'); // Удаляет класс у модального окна
+  document.removeEventListener('keydown', handleEscape); // удалил слушатель клавиши Escape
+  document.removeEventListener('submit', handleConfirmDeleteFormSubmit);
 };
 
-// функция управлением клавиши Escape
-export function handleEscape(evt) {
+export function handleEscape(evt) { // функция управлением клавиши Escape
   if (evt.key === 'Escape') {
     const openedPopup = document.querySelector('.popup_is-opened'); // 
     closeModal(openedPopup)

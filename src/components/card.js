@@ -1,111 +1,93 @@
 import { cardTemplate } from "..";
-import { openModal, closeModal } from "./modal";
-import { deleteCard, putLikeCard, deleteLikeCard } from "../scripts/api";
+import { deleteCard, putLikeCard, deleteLikeCard } from "./api";
 
+export function createCard(dataCard, info, openModalImage, openModal, closeModal, removeCard, likeCard, popupConfirmDelete, deleteForm, renderLoadingDeleteCard) { // @todo: Функция создания карточки
 
-// @todo: Функция создания карточки
+  const newCard = cardTemplate.cloneNode(true); // копирую шаблон
+  const cardImage = newCard.querySelector('.card__image'); // нахожу элемент и записываю в переменную
+  const cardTitle = newCard.querySelector('.card__title'); // нахожу элемент и записываю в переменную
+  cardImage.src = dataCard.link; // задаю значение
+  cardImage.alt = dataCard.name; // задаю значение
+  cardTitle.textContent = dataCard.name; // задаю значение
 
-export function createCard(dataCard, removeCard, openModalImage, likeCard, popupConfirmDelete, deleteForm) {
+  cardImage.addEventListener('click', () => { // добавляю слушатель на элемент картинки и вызываю при клике на нем openModalImage
+    openModalImage(dataCard.link, dataCard.name);
+  });
 
-  //Копирую шаблон, нахожу элементы и записываю в переменные
-  const newCard = cardTemplate.cloneNode(true);
-  const cardImage = newCard.querySelector('.card__image');
-  const cardTitle = newCard.querySelector('.card__title');
-
-  const MY_ID = "33d5db0e38bbc150a00be59e";
-  const usersId = dataCard.owner['_id'];
+  const iconDelete = newCard.querySelector('.card__delete-button'); // нахожу кнопку удаления карточки и вешаю обработчик
+  const userId = info._id;
+  const userCardId = dataCard.owner['_id'];
   const cardId = dataCard._id;
-  // console.log(cardId);
-  //нахожу кнопку удаления карточки и вешаю обработчик
-  const iconDelete = newCard.querySelector('.card__delete-button');
-  
-  if(MY_ID === usersId) {
+  if(userId === userCardId) {
     iconDelete.addEventListener('click', () => {
       openModal(popupConfirmDelete);
-
-      deleteForm.addEventListener('click', () => {
-        handleConfirmDeleteFormSubmit(cardId, popupConfirmDelete, iconDelete);
-      })
+      
+      const handleConfirmDeleteFormSubmit = (event) => {
+        event.preventDefault();
+        renderLoadingDeleteCard(true, event.submitter);
+        deleteCard(cardId)
+          .then(() => {
+            removeCard(iconDelete);
+            closeModal(popupConfirmDelete, handleConfirmDeleteFormSubmit);
+            deleteForm.removeEventListener('submit', handleConfirmDeleteFormSubmit);
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+          .finally(() => {
+            renderLoadingDeleteCard(false, event.submitter);
+          })
+      };
+      deleteForm.addEventListener('submit', handleConfirmDeleteFormSubmit);
     });
   }
   else {
     iconDelete.hidden = true;
   }
-  
-  //нахожу кнопку лайка карточки и вешаю обработчик
-  const iconLike = newCard.querySelector('.card__like-button');
-  // iconLike.addEventListener('click', likeCard);
+
+  const iconLike = newCard.querySelector('.card__like-button'); // нахожу кнопку лайка карточки и вешаю обработчик
+  const iconLikeCount = newCard.querySelector('.current-value-likes');  // нахожу span кол-ва лайков карточки
+  const likes = dataCard.likes; // создаю переменную и помещаю в нее массив лайкнувших карточку
+  const likesCount = likes.length; // создаю переменную-счетчик и помещаю в нее длинну массива лайкнувших
+  iconLikeCount.textContent = likesCount; // вставляю значение в спан
+
   iconLike.addEventListener('click', () => {
-    putLikeCard(cardId)
+    putLikeCard(cardId, likesCount)
       .then((res) => {
-        likeCard(iconLike, res, iconLikeCount, cardId);
+        if(!iconLike.classList.contains('card__like-button_is-active')){
+          likeCard(iconLike, res, iconLikeCount);          
+        }
+        else {
+          deleteLikeCard(cardId)
+            .then((res) => {
+              iconLike.classList.toggle('card__like-button_is-active')
+              const likes = res.likes;
+              const likesCount = likes.length;
+              iconLikeCount.textContent = likesCount;
+            })
+            .catch((err) => {
+              console.log(err);
+            })
+        }
+      })
+      .catch((err) => {
+        console.log(err);
       })
   });
-
-  //нахожу span кол-ва лайков карточки
-  const iconLikeCount = newCard.querySelector('.current-value-likes');
-  //создаю переменную и помещаю в нее массив лайкнувших карточку
-  const likes = dataCard.likes;
-  //создаю переменную-счетчик и помещаю в нее длинну массива лайкнувших
-  const likesCount = likes.length;
-  //вставляю значение в спан
-  iconLikeCount.textContent = likesCount;
-
-  // задаю значения и возвращаю карточку
-  cardImage.src = dataCard.link;
-  cardImage.alt = dataCard.name;
-  cardTitle.textContent = dataCard.name;
-
-  // добавляю слушатель на элемент картинки и вызываю при клике на нем openModalImage
-  cardImage.addEventListener('click', () => {
-    openModalImage(dataCard.link, dataCard.name);
-  });
-
-  // возращаю карточку
-  return newCard;
+ 
+  return newCard; // возращаю карточку
 }
 
-function handleConfirmDeleteFormSubmit(id, popupConfirmDelete, iconDelete) {
-  deleteCard(id)
-    .then(() => {
-    removeCard(iconDelete);
-  })
-  closeModal(popupConfirmDelete); // вызов функции закрытия попапа
-}
-
-// @todo: Функция удаления карточки
-
-export function removeCard(evt) {
-
-  //передаю ближайший родительский элемент и удаляю
-  const card = evt.closest('.card');
+export function removeCard(evt) { // @todo: Функция удаления карточки
+  const card = evt.closest('.card'); //передаю ближайший родительский элемент и удаляю
   card.remove();
 };
 
-// @todo: Функция лайка карточки
-
-export function likeCard(iconLike, res, iconLikeCount, cardId) {
-  if(
-    // Добавляю класс анимации на элемент по котором будет клик мышкой
-    iconLike.classList.toggle('card__like-button_is-active')) {
-      //создаю переменную и помещаю в нее массив лайкнувших карточку
-      const likes = res.likes;
-      //создаю переменную-счетчик и помещаю в нее длинну массива лайкнувших
-      const likesCount = likes.length;
-      //вставляю значение в спан
-      iconLikeCount.textContent = likesCount;
-
-    }
-  else {
-    deleteLikeCard(cardId)
-      .then((res) => {
-        const likes = res.likes;
-        //создаю переменную-счетчик и помещаю в нее длинну массива лайкнувших
-        const likesCount = likes.length;
-        //вставляю значение в спан
-        iconLikeCount.textContent = likesCount;
-      })
-  }
-  
+export function likeCard(iconLike, res, iconLikeCount) { // @todo: Функция лайка карточки
+   // Добавляю класс анимации на элемент по котором будет клик мышкой
+  iconLike.classList.toggle('card__like-button_is-active')
+  const likes = res.likes;
+  const likesCount = likes.length;
+  iconLikeCount.textContent = likesCount;
 }
 
