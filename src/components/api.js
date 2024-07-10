@@ -32,7 +32,8 @@ function updateUserMe(updateName, updateAbout) { // Функция - запро�
       name: updateName,
       about: updateAbout
     })
-  });
+  })
+    .then(getResponseData);
 };
 
 function addCardOnServer(initialCard) { // Функция - запрос на добавление карточки на сервер

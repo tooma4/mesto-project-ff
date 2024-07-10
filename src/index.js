@@ -33,8 +33,6 @@ const popupAddCard = document.querySelector('.popup_type_new-card'); // попа
 
 const popupImage = document.querySelector('.popup_type_image'); // попап карточки
 
-const popupConfirmDelete = document.querySelector('.popup_type_confirm-delete'); // попап потверждения удаления
-
 const popupAvatar = document.querySelector('.popup_type_avatar'); // попап аватарки
 
 const popupImageLink = document.querySelector('.popup__image'); // элемент картинки попапа
@@ -52,8 +50,6 @@ const cardsContainer = document.querySelector('.places__list'); // место с
 // FORMS
 
 const profileForm = popupEdit.querySelector('div.popup_type_edit .popup__content .popup__form'); //Форма редактирования профиля
-
-const deleteForm = document.querySelector('div.popup_type_confirm-delete .popup__content-min .popup__form'); //Форма удаления карточки
 
 const avatarForm = document.querySelector('div.popup_type_avatar .popup__content .popup__form'); // форма аватарки
 
@@ -115,7 +111,6 @@ function handleProfileFormSubmit(evt) { // функция обработчик �
         .then((data) => {
           profileName.textContent = data.name;  // Выбераны элементы, куда должны быть вставлены значения полей          
           profileJob.textContent = data.about;  // и вставленыновые значения с помощью textContent
-          clearValidation(popupEdit, validationConfig);
           });    
         closeModal(popupEdit);
     })
@@ -137,7 +132,7 @@ function handleAddCardFormSubmit(evt) { // функция обработчик �
                                                     
   addCardOnServer(initialCard) // отправляю данные новой карточки на сервер
   .then((res) => {
-    addCardBefore(createCard(res, res.owner, openModalImage, openModal, closeModal, removeCard, likeCard, popupConfirmDelete, deleteForm, renderLoadingDeleteCard)); // и создаю новую карточку на основе этих данных 
+    addCardBefore(createCard(res, res.owner, openModalImage, removeCard, likeCard)); // и создаю новую карточку на основе этих данных 
     closeModal(popupAddCard);
     evt.target.reset(); // Сбрасываю значения полей
   })
@@ -158,11 +153,6 @@ function renderLoadingProfileAndAddCardAndAvatar(isLoading, button) { // фун�
   button.textContent = isLoading ? "Сохранение..." : "Сохранить";
 }
 
-// в обработчике удаления добавить незабыть ---НЕЗАБЫТЬ-----
-function renderLoadingDeleteCard(isLoading, button) { // функция отрисовки загрузки, пока данные аватарки и удаления карты, загружаются
-  button.textContent = isLoading ? "Сохранение..." : "Да";
-}
-
 enableValidation(validationConfig); // включение валидации всех форм
 
 Promise.all([                 // в Promise.all передаем массив промисов которые нужно выполнить 
@@ -170,7 +160,7 @@ Promise.all([                 // в Promise.all передаем массив п
   getInitialCards() ]) // @todo: Вывести карточки пользователей на страницу
   .then(([info, initialCards]) => {    // попадаем сюда, когда оба промиса будут выполнены
     initialCards.forEach((dataCard) => { // Перебираю массив на каждом элементе и передаю элемент массива в функцию, затем выводятся карточки пользователей на страницу
-      addCard(createCard(dataCard, info, openModalImage, openModal, closeModal, removeCard, likeCard, popupConfirmDelete, deleteForm, renderLoadingDeleteCard));
+      addCard(createCard(dataCard, info._id, openModalImage, removeCard, likeCard));
     });
 
     profileName.textContent = info.name; // @todo: Вывести данные Имя, Занятие, Аватар на страницу

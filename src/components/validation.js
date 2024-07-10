@@ -11,24 +11,13 @@ function enableValidation(validationConfig) {
 function clearValidation(formElement, validationConfig) {
     
   const inputList = Array.from(formElement.querySelectorAll(validationConfig.inputSelector)); // Находим все поля ввода в форме
-    
-    
   const buttonElement = formElement.querySelector(validationConfig.submitButtonSelector); // Находим кнопку отправки формы
   
   inputList.forEach((inputElement) => { // Очищаем ошибки для каждого поля ввода
-
-    const errorElement = formElement.querySelector(`${inputElement.id}-error`);
-
-    if (errorElement) {
-        errorElement.textContent = ''; // Скрываем сообщение об ошибке
-        errorElement.classList.remove(validationConfig.errorClass);
-    }
-  
-    inputElement.classList.remove(validationConfig.inputErrorClass); 
+    hideInputError(formElement, inputElement, validationConfig);
   });
   
-  buttonElement.classList.add(validationConfig.inactiveButtonClass); // Делаем кнопку отправки неактивной
-  buttonElement.disabled = true;
+  toggleButtonState(inputList, buttonElement, validationConfig);
 }
   
   function setEventListeners(formElement, validationConfig) {

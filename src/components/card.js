@@ -1,7 +1,7 @@
 import { cardTemplate } from "..";
 import { deleteCard, putLikeCard, deleteLikeCard } from "./api";
 
-export function createCard(dataCard, info, openModalImage, openModal, closeModal, removeCard, likeCard, popupConfirmDelete, deleteForm, renderLoadingDeleteCard) { // @todo: Функция создания карточки
+export function createCard(dataCard, userId, openModalImage, removeCard, likeCard) { // @todo: Функция создания карточки
 
   const newCard = cardTemplate.cloneNode(true); // копирую шаблон
   const cardImage = newCard.querySelector('.card__image'); // нахожу элемент и записываю в переменную
@@ -15,35 +15,23 @@ export function createCard(dataCard, info, openModalImage, openModal, closeModal
   });
 
   const iconDelete = newCard.querySelector('.card__delete-button'); // нахожу кнопку удаления карточки и вешаю обработчик
-  const userId = info._id;
   const userCardId = dataCard.owner['_id'];
   const cardId = dataCard._id;
+  
   if(userId === userCardId) {
     iconDelete.addEventListener('click', () => {
-      openModal(popupConfirmDelete);
-      
-      const handleConfirmDeleteFormSubmit = (event) => {
-        event.preventDefault();
-        renderLoadingDeleteCard(true, event.submitter);
-        deleteCard(cardId)
+      deleteCard(cardId)
           .then(() => {
             removeCard(iconDelete);
-            closeModal(popupConfirmDelete, handleConfirmDeleteFormSubmit);
-            deleteForm.removeEventListener('submit', handleConfirmDeleteFormSubmit);
           })
           .catch((err) => {
             console.log(err);
-          })
-          .finally(() => {
-            renderLoadingDeleteCard(false, event.submitter);
-          })
-      };
-      deleteForm.addEventListener('submit', handleConfirmDeleteFormSubmit);
+          });
     });
   }
   else {
     iconDelete.hidden = true;
-  }
+  };
 
   const iconLike = newCard.querySelector('.card__like-button'); // нахожу кнопку лайка карточки и вешаю обработчик
   const iconLikeCount = newCard.querySelector('.current-value-likes');  // нахожу span кол-ва лайков карточки
@@ -51,30 +39,38 @@ export function createCard(dataCard, info, openModalImage, openModal, closeModal
   const likesCount = likes.length; // создаю переменную-счетчик и помещаю в нее длинну массива лайкнувших
   iconLikeCount.textContent = likesCount; // вставляю значение в спан
 
+  if (likes.some(like => like._id === userId)) {
+    iconLike.classList.add('card__like-button_is-active');
+  } else {
+    iconLike.classList.remove('card__like-button_is-active');
+  }
+
   iconLike.addEventListener('click', () => {
-    putLikeCard(cardId, likesCount)
+
+    if(iconLike.classList.contains('card__like-button_is-active')) {
+    deleteLikeCard(cardId)
       .then((res) => {
-        if(!iconLike.classList.contains('card__like-button_is-active')){
-          likeCard(iconLike, res, iconLikeCount);          
-        }
-        else {
-          deleteLikeCard(cardId)
-            .then((res) => {
-              iconLike.classList.toggle('card__like-button_is-active')
-              const likes = res.likes;
-              const likesCount = likes.length;
-              iconLikeCount.textContent = likesCount;
-            })
-            .catch((err) => {
-              console.log(err);
-            })
-        }
+        iconLike.classList.toggle('card__like-button_is-active')
+        const updatedLikes = res.likes;
+        const likesCount = updatedLikes.length;
+        iconLikeCount.textContent = likesCount;
+        dataCard.likes = updatedLikes;
       })
       .catch((err) => {
         console.log(err);
       })
+    }
+    else {
+      putLikeCard(cardId, likesCount)
+        .then((res) => {
+          likeCard(iconLike, res, iconLikeCount);
+          dataCard.likes = res.likes;
+        })
+        .catch((err) => {
+        console.log(err);
+        })
+    }
   });
- 
   return newCard; // возращаю карточку
 }
 
